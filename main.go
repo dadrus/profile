@@ -1,6 +1,7 @@
 package main
 
 import (
+	authn "github.com/dadrus/gin-authn"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"profile/model"
@@ -11,10 +12,12 @@ var router *gin.Engine
 
 var login_url = "http://127.0.0.1:8081/login"
 var own_url = "http://127.0.0.1:8090"
+var main_url = "http://127.0.0.1:8081"
 
 func main() {
 	router = gin.Default()
 	router.LoadHTMLGlob("templates/*")
+	router.Use(authn.OAuth2Aware())
 
 	initRoutes()
 
@@ -24,8 +27,8 @@ func main() {
 func initRoutes() {
 	router.GET("/register", ShowRegisterPage)
 	router.POST("/register", Register)
-	router.GET("/profile/:id", GetProfile)
-	router.POST("/profile/:id", UpdateProfile)
+	router.GET("/profile/:id", authn.ClaimsAllowed("profile"), GetProfile)
+	router.POST("/profile/:id", authn.ClaimsAllowed("profile"), UpdateProfile)
 	router.PUT("/profile/:id", UpdateProfile)
 	router.POST("/authenticate", AuthenticateUser)
 }
