@@ -1,0 +1,75 @@
+<!--Embed the header.html template at this location-->
+{{ template "header.html" .}}
+
+<div class="row">
+    <div class="col text-center">
+        <img class="mb-4" src="https://getbootstrap.com/docs/4.0/assets/brand/bootstrap-solid.svg"
+             alt=""
+             width="72"
+             height="72">
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4 offset-md-4">
+        <div class="card">
+            <form class="form-signin" action="/register" method="post">
+                <div class="card-body">
+                    <h5 class="card-title"><b>Create account</b></h5><br>
+                    <div class="form-row">
+                        <div class="form-group col">
+                            {{ if .error }}
+                            <input type="email" name="email" class="form-control is-invalid"
+                                   placeholder="Email address" value="{{ .email }}"
+                                   required autofocus>
+                            {{ else }}
+                                <input type="email" name="email" class="form-control" placeholder="Email address"
+                                       required autofocus>
+                            {{ end }}
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col">
+                            {{ if .error }}
+                                <input type="password" name="password" class="form-control is-invalid"
+                                       placeholder="Password" required>
+                            {{ else }}
+                                <input type="password" name="password" class="form-control" placeholder="Password"
+                                       required>
+                            {{ end }}
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col">
+                            {{ if .error }}
+                                <input type="password" name="repeated_password" class="form-control is-invalid"
+                                       placeholder="Repeat password" required>
+                                <div class="invalid-feedback">
+                                    {{ .error }}
+                                </div>
+                            {{ else }}
+                                <input type="password" name="repeated_password" class="form-control"
+                                       placeholder="Repeat password" required>
+                            {{ end }}
+                        </div>
+                    </div>
+
+                    <button class="btn btn-medium btn-success btn-block" type="submit">Create Account</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-3">
+    <div class="col col-md-4 offset-md-4">
+        <hr>
+        <p class="text-center">Already have an account?</p>
+        <a class="btn btn-medium btn-secondary btn-block" href="{{ .login_url }}" role="button">Sign in</a>
+    </div>
+</div>
+
+<!--Embed the footer.html template at this location-->
+{{ template "footer.html" .}}

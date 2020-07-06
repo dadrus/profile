@@ -1,0 +1,136 @@
+<!--Embed the header.html template at this location-->
+{{ template "header.html" .}}
+
+<h2 class="mt-3">Profile</h2>
+<hr>
+
+<div class="row">
+
+    <!-- navigation column -->
+    <div class="col-md-3">
+        <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+            <a class="nav-link active" id="v-pills-home-tab" data-toggle="pill" href="#v-pills-profile" role="tab"
+               aria-controls="v-pills-home" aria-selected="true">Profile</a>
+            <a class="nav-link" id="v-pills-profile-tab" data-toggle="pill" href="#v-pills-contact" role="tab"
+               aria-controls="v-pills-profile" aria-selected="false">Contact</a>
+            <a class="nav-link" id="v-pills-messages-tab" data-toggle="pill" href="#v-pills-address" role="tab"
+               aria-controls="v-pills-messages" aria-selected="false">Address</a>
+        </div>
+    </div>
+
+    <!-- edit form column -->
+    <div class="col-md-9">
+
+        <form class="form-horizontal" role="form" method="post" action="/profile/{{ .customer.ID }}">
+            <input type="hidden" name="id" value="{{ .customer.ID }}">
+
+            <div class="tab-content" id="v-pills-tabContent">
+                <div class="tab-pane fade" id="v-pills-address" role="tabpanel"
+                     aria-labelledby="v-pills-address-tab">
+                    <div class="form-row">
+                        <div class="col form-group">
+                            <label for="street_address">Street Address</label>
+                            <input class="form-control" type="text" id="street_address" name="street_address" value="{{ if .customer.Address }}{{ .customer.Address.Street }}{{- end}}">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="col-md-6 form-group">
+                            <label for="zip">Zip</label>
+                            <input class="form-control" type="text" id="zip" name="zip" value="{{ if .customer.Address }}{{ .customer.Address.Zip }}{{- end}}">
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label for="city">City</label>
+                            <input class="form-control" type="text" id="city" name="city" value="{{ if .customer.Address }}{{ .customer.Address.City }}{{- end}}">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="col-md-6 form-group">
+                            <label for="state">State</label>
+                            <input class="form-control" type="text" id="state" name="state" value="{{ if .customer.Address }}{{ .customer.Address.State }}{{- end}}">
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label for="city">Country</label>
+                            <input class="form-control" type="text" id="country" name="country" value="{{ if .customer.Address }}{{ .customer.Address.Country }}{{- end}}">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="v-pills-contact" role="tabpanel"
+                     aria-labelledby="v-pills-contact-tab">
+                    <div class="form-row">
+                        <div class="col-md-6 form-group">
+                            <label for="email">Email</label>
+                            <input class="form-control" type="tel" id="email" name="email" value="{{ .customer.Email }}">
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label for="phone">Phone</label>
+                            <input class="form-control" type="tel" id="phone" name="phone" value="{{ .customer.PhoneNumber }}">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade show active" id="v-pills-profile" role="tabpanel"
+                     aria-labelledby="v-pills-profile-tab">
+                    <div class="form-row">
+                        <div class="col-md-3 form-group">
+                            <img src="//placehold.it/100" class="avatar img-lg rounded-circle border shadow"
+                                 alt="avatar">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="col-md-6 form-group">
+                            <label for="first_name">First Name</label>
+                            <input type="text" class="form-control" id="first_name" name="first_name" value="{{ .customer.FirstName }}">
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label for="last_name">Last Name</label>
+                            <input type="text" class="form-control" id="last_name" name="last_name" value="{{ .customer.LastName }}">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="col-md-6 form-group">
+                            <label for="user_name">User Name</label>
+                            <input type="text" class="form-control" id="user_name" name="user_name" value="{{ .customer.UserName }}">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="col-md-6 form-group">
+                            <label for="birthday">Birthday</label>
+                            <input class="form-control" type="date" id="birthday" name="birthday" value="{{if .customer.Birthday }}{{if not .customer.Birthday.IsZero }}{{ .customer.Birthday.Format "2006-01-02" }}{{- end}}{{- end}}">
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <div class="form-control-label mb-1">Gender</div>
+                            <div class="pt-2 pb-2">
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" {{ if eq .customer.Gender 1 }}checked{{ end }} type="radio" id="gender_diverse" name="gender" value="1">
+                                    <label class="form-check-label" for="gender_diverse">Diverse</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" {{ if eq .customer.Gender 2 }}checked{{ end }} type="radio" id="gender_female" name="gender" value="2">
+                                    <label class="form-check-label" for="gender_female">Female</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" {{ if eq .customer.Gender 3 }}checked{{ end }} type="radio" id="gender_male" name="gender" value="3">
+                                    <label class="form-check-label" for="gender_male">Male</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr>
+                <div class="form-row">
+                    <div class="col-md-8 form-group">
+                        <input type="submit" class="btn btn-success" value="Save Changes">
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!--Embed the footer.html template at this location-->
+{{ template "footer.html" .}}
