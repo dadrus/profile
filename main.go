@@ -2,6 +2,7 @@ package main
 
 import (
 	authn "github.com/dadrus/gin-authn"
+	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"profile/model"
@@ -11,12 +12,12 @@ import (
 var router *gin.Engine
 
 var login_url = "http://127.0.0.1:8081/login"
-var own_url = "http://127.0.0.1:8090"
+var own_url = "http://127.0.0.1:8091"
 var main_url = "http://127.0.0.1:8081"
 
 func main() {
 	router = gin.Default()
-	router.LoadHTMLGlob("templates/*")
+	router.LoadHTMLGlob("web/templates/*")
 	router.Use(authn.OAuth2Aware())
 
 	initRoutes()
@@ -27,8 +28,8 @@ func main() {
 func initRoutes() {
 	router.GET("/register", ShowRegisterPage)
 	router.POST("/register", Register)
-	router.GET("/profile/:id", authn.ClaimsAllowed("profile"), GetProfile)
-	router.POST("/profile/:id", authn.ClaimsAllowed("profile"), UpdateProfile)
+	router.GET("/profile/:id", authn.ScopesAllowed("profile"), GetProfile)
+	router.POST("/profile/:id", authn.ScopesAllowed("profile"), UpdateProfile)
 	router.PUT("/profile/:id", UpdateProfile)
 	router.POST("/authenticate", AuthenticateUser)
 }
@@ -113,11 +114,16 @@ func Register(c *gin.Context) {
 		return
 	}
 
-	customer := model.NewCustomer(registerData.Email, registerData.Password)
-	c.Redirect(http.StatusSeeOther, "/profile/"+strconv.Itoa(customer.ID))
+	model.NewCustomer(registerData.Email, registerData.Password)
+	c.Redirect(http.StatusSeeOther, main_url + "/login")
 }
 
 func GetProfile(c *gin.Context) {
+	var userClaims map[string]interface{}
+	if token, present := c.Get("id_token"); present {
+		userClaims = token.(*jwt.Token).Claims.(jwt.MapClaims)
+	}
+
 	strId := c.Param("id")
 	id, err := strconv.Atoi(strId)
 	if err != nil {
@@ -133,7 +139,9 @@ func GetProfile(c *gin.Context) {
 
 	render(c, http.StatusOK, "profile.html", gin.H{
 		"title":    "Profile",
+		"user": userClaims,
 		"customer": customer,
+		"home": main_url,
 	}, "customer")
 }
 
