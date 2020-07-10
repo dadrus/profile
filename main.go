@@ -1,19 +1,29 @@
 package main
 
 import (
+	"errors"
 	authn "github.com/dadrus/gin-authn"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"os"
 	"profile/model"
 	"strconv"
 )
 
 var router *gin.Engine
 
-var login_url = "http://127.0.0.1:8081/login"
-var own_url = "http://127.0.0.1:8091"
-var main_url = "http://127.0.0.1:8081"
+var login_url = getEnv("LOGIN_URL", "http://127.0.0.1:8081/login")
+var own_url = getEnv("OWN_URL", "http://127.0.0.1:8091")
+var main_url = getEnv("MAIN_URL", "http://127.0.0.1:8081")
+
+func getEnv(key string, defaultValue string) string {
+	if val, present := os.LookupEnv(key); present {
+		return val
+	} else {
+		return defaultValue
+	}
+}
 
 func main() {
 	router = gin.Default()
@@ -22,7 +32,41 @@ func main() {
 
 	initRoutes()
 
-	router.Run(":8090")
+	port := getEnv("PORT", "8090")
+
+	if tlsConfig, err := getTlsConfig(); err == nil {
+		router.RunTLS(":"+port, tlsConfig.TlsCertFile, tlsConfig.TlsKeyFile)
+	} else {
+		router.Run(":" + port)
+	}
+}
+
+type tlsConfig struct {
+	TlsKeyFile  string
+	TlsCertFile string
+}
+
+func getTlsConfig() (*tlsConfig, error) {
+	tlsKeyFile := os.Getenv("TLS_KEY")
+	if len(tlsKeyFile) == 0 {
+		return nil, errors.New("no TLS key configured")
+	}
+	if _, err := os.Stat(tlsKeyFile); err != nil {
+		return nil, errors.New("configured TLS key not available")
+	}
+
+	tlsCertFile := os.Getenv("TLS_CERT")
+	if len(tlsCertFile) == 0 {
+		return nil, errors.New("no TLS cert configured")
+	}
+	if _, err := os.Stat(tlsCertFile); err != nil {
+		return nil, errors.New("configured TLS cert not available")
+	}
+
+	return &tlsConfig{
+		TlsKeyFile:  tlsKeyFile,
+		TlsCertFile: tlsCertFile,
+	}, nil
 }
 
 func initRoutes() {
