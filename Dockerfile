@@ -44,6 +44,7 @@ WORKDIR /opt/profile
 USER appuser:appuser
 
 ENV GIN_MODE=release
+ENV PORT 8090
 
-EXPOSE 8080
+EXPOSE $PORT
 ENTRYPOINT ["/opt/profile/profile"]
