@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	authn "github.com/dadrus/gin-authn"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
@@ -13,6 +14,7 @@ import (
 
 var router *gin.Engine
 
+var port = getEnv("PORT", "8090")
 var login_url = getEnv("LOGIN_URL", "http://127.0.0.1:8081/login")
 var own_url = getEnv("OWN_URL", "http://127.0.0.1:8091")
 var main_url = getEnv("MAIN_URL", "http://127.0.0.1:8081")
@@ -32,12 +34,14 @@ func main() {
 
 	initRoutes()
 
-	port := getEnv("PORT", "8090")
-
 	if tlsConfig, err := getTlsConfig(); err == nil {
-		router.RunTLS(":"+port, tlsConfig.TlsCertFile, tlsConfig.TlsKeyFile)
+		fmt.Println("Starting with TLS mode")
+		err = router.RunTLS(":"+port, tlsConfig.TlsCertFile, tlsConfig.TlsKeyFile)
+		fmt.Println("Error: " + err.Error())
 	} else {
-		router.Run(":" + port)
+		fmt.Println("Could not load TLS settings because of " + err.Error())
+		err = router.Run(":" + port)
+		fmt.Println("Error: " + err.Error())
 	}
 }
 
